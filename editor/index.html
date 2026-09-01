@@ -148,6 +148,7 @@
       </select>
     </div>
     <input type="text" id="newDomain" placeholder="Domæne til logo (valgfrit, fx tdc.dk)">
+    <input type="text" id="newIcon" placeholder="SF Symbol-ikon (valgfrit, fx house.fill)">
     <div class="entry-actions">
       <button class="btn btn-secondary" id="newSuggestBtn" onclick="suggestPrice(null)">✨ Slå værdi op med AI</button>
       <button class="btn btn-primary" onclick="addEntry()">Tilføj</button>
@@ -221,7 +222,7 @@ function render() {
       ${e.domain ? `<img class="logo" src="${logoUrl(e.domain)}" alt="">` : '<div class="logo"></div>'}
       <div>
         <div class="entry-title">${escapeHtml(e.name)} <span class="badge ${e.category === 'income' ? 'badge-income' : 'badge-expense'}">${categoryLabel(e.category)}</span></div>
-        <div class="entry-sub">${e.price} kr. · ${cycleLabel(e.billingCycle)}</div>
+        <div class="entry-sub">${e.price} kr. · ${cycleLabel(e.billingCycle)}${e.icon ? ' · ' + escapeHtml(e.icon) : ''}</div>
       </div>
       <div class="chevron">▶</div>
     `;
@@ -248,6 +249,8 @@ function render() {
       </div>
       <div class="field-label">Domæne (til logo, valgfrit)</div>
       <input type="text" id="domain-${i}" value="${escapeAttr(e.domain || '')}">
+      <div class="field-label">SF Symbol-ikon (valgfrit, bruges hvis intet domæne)</div>
+      <input type="text" id="icon-${i}" value="${escapeAttr(e.icon || '')}">
       <div class="entry-actions">
         <button class="btn btn-secondary" id="suggestBtn-${i}" onclick="suggestPrice(${i})">✨ Opdater værdi med AI</button>
       </div>
@@ -304,6 +307,7 @@ async function saveEntry(i, originalName) {
     price: parseFloat(document.getElementById(`price-${i}`).value) || 0,
     billingCycle: document.getElementById(`cycle-${i}`).value,
     domain: document.getElementById(`domain-${i}`).value.trim(),
+    icon: document.getElementById(`icon-${i}`).value.trim(),
   };
   const data = await mutate('/api/budgetItems/' + encodeURIComponent(originalName), 'PUT', updated, 'Gemmer…');
   if (!data) return;
@@ -327,13 +331,15 @@ async function addEntry() {
   const price = parseFloat(document.getElementById('newPrice').value) || 0;
   const billingCycle = document.getElementById('newCycle').value;
   const domain = document.getElementById('newDomain').value.trim();
+  const icon = document.getElementById('newIcon').value.trim();
   if (!name) { setStatus('Posten skal have et navn', 'err'); return; }
   if (price <= 0) { setStatus('Indsæt et beløb', 'err'); return; }
-  const data = await mutate('/api/budgetItems', 'POST', { name, category, price, billingCycle, domain }, 'Tilføjer…');
+  const data = await mutate('/api/budgetItems', 'POST', { name, category, price, billingCycle, domain, icon }, 'Tilføjer…');
   if (!data) return;
   document.getElementById('newName').value = '';
   document.getElementById('newPrice').value = '';
   document.getElementById('newDomain').value = '';
+  document.getElementById('newIcon').value = '';
   setStatus(syncMessage('Tilføjet.', data.sync), data.sync && !data.sync.ok ? 'err' : 'ok');
   render();
 }

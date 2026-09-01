@@ -57,6 +57,7 @@ def clean_entry(entry, index_label):
     if not name:
         raise ValueError(f"{index_label} mangler et navn")
     domain = str(entry.get("domain", "")).strip()
+    icon = str(entry.get("icon", "")).strip()
     category = str(entry.get("category", "")).strip()
     if category not in VALID_CATEGORIES:
         raise ValueError(f'"{name}" skal have "fixedExpense" eller "income" som type')
@@ -72,6 +73,8 @@ def clean_entry(entry, index_label):
     cleaned = {"name": name, "category": category, "billingCycle": cycle, "price": price}
     if domain:
         cleaned["domain"] = domain
+    if icon:
+        cleaned["icon"] = icon
     return cleaned
 
 
