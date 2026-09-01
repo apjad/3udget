@@ -1,0 +1,28 @@
+{
+  "budgetItems": [
+    {"name": "Husleje (lejlighed)", "category": "fixedExpense", "billingCycle": "monthly", "price": 8500},
+    {"name": "Boligydelse/realkreditlån (hus)", "category": "fixedExpense", "billingCycle": "monthly", "price": 12500},
+    {"name": "El", "category": "fixedExpense", "billingCycle": "monthly", "price": 850},
+    {"name": "Varme (aconto)", "category": "fixedExpense", "billingCycle": "quarterly", "price": 4500},
+    {"name": "Vand (aconto)", "category": "fixedExpense", "billingCycle": "quarterly", "price": 1800},
+    {"name": "Internet", "category": "fixedExpense", "billingCycle": "monthly", "price": 299},
+    {"name": "Mobilabonnement", "category": "fixedExpense", "billingCycle": "monthly", "price": 149},
+    {"name": "Indboforsikring", "category": "fixedExpense", "billingCycle": "monthly", "price": 150},
+    {"name": "Bilforsikring", "category": "fixedExpense", "billingCycle": "monthly", "price": 450},
+    {"name": "Husforsikring", "category": "fixedExpense", "billingCycle": "monthly", "price": 250},
+    {"name": "Fagforening", "category": "fixedExpense", "billingCycle": "monthly", "price": 450},
+    {"name": "A-kasse", "category": "fixedExpense", "billingCycle": "monthly", "price": 500},
+    {"name": "Vuggestue", "category": "fixedExpense", "billingCycle": "monthly", "price": 3800},
+    {"name": "Børnehave", "category": "fixedExpense", "billingCycle": "monthly", "price": 2500},
+    {"name": "SFO", "category": "fixedExpense", "billingCycle": "monthly", "price": 1800},
+    {"name": "Bilydelse/leasing", "category": "fixedExpense", "billingCycle": "monthly", "price": 4500},
+    {"name": "Benzin/diesel", "category": "fixedExpense", "billingCycle": "monthly", "price": 1800},
+    {"name": "Pendlerkort", "category": "fixedExpense", "billingCycle": "monthly", "price": 1200},
+    {"name": "Fitnessabonnement", "category": "fixedExpense", "billingCycle": "monthly", "price": 349},
+    {"name": "Løn (fuldtid, efter skat)", "category": "income", "billingCycle": "monthly", "price": 28500},
+    {"name": "SU (udeboende)", "category": "income", "billingCycle": "monthly", "price": 7030},
+    {"name": "Børnetilskud/børnepenge (pr. barn)", "category": "income", "billingCycle": "quarterly", "price": 4800},
+    {"name": "Boligstøtte", "category": "income", "billingCycle": "monthly", "price": 1800},
+    {"name": "Dagpenge (maks. sats)", "category": "income", "billingCycle": "monthly", "price": 21116}
+  ]
+}
