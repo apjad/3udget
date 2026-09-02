@@ -6,7 +6,9 @@
       "billingCycle": "monthly",
       "price": 8500,
       "icon": "house.fill",
-      "quickStartTags": ["rent"]
+      "quickStartTags": [
+        "rent"
+      ]
     },
     {
       "name": "Boligydelse/realkreditlån (hus)",
@@ -14,15 +16,18 @@
       "billingCycle": "monthly",
       "price": 12500,
       "icon": "house.fill",
-      "quickStartTags": ["own"]
+      "quickStartTags": [
+        "own"
+      ]
     },
     {
       "name": "El",
       "category": "fixedExpense",
       "billingCycle": "monthly",
-      "price": 850,
-      "icon": "bolt.fill",
-      "quickStartTags": ["always"]
+      "price": 850.0,
+      "quickStartTags": [
+        "always"
+      ]
     },
     {
       "name": "Varme (aconto)",
@@ -44,7 +49,9 @@
       "billingCycle": "monthly",
       "price": 299,
       "icon": "wifi",
-      "quickStartTags": ["always"]
+      "quickStartTags": [
+        "always"
+      ]
     },
     {
       "name": "Mobilabonnement",
@@ -52,7 +59,9 @@
       "billingCycle": "monthly",
       "price": 149,
       "icon": "phone.fill",
-      "quickStartTags": ["always"]
+      "quickStartTags": [
+        "always"
+      ]
     },
     {
       "name": "Indboforsikring",
@@ -60,7 +69,9 @@
       "billingCycle": "monthly",
       "price": 150,
       "icon": "shield.fill",
-      "quickStartTags": ["always"]
+      "quickStartTags": [
+        "always"
+      ]
     },
     {
       "name": "Bilforsikring",
@@ -68,7 +79,9 @@
       "billingCycle": "monthly",
       "price": 450,
       "icon": "car.fill",
-      "quickStartTags": ["car"]
+      "quickStartTags": [
+        "car"
+      ]
     },
     {
       "name": "Husforsikring",
@@ -118,7 +131,9 @@
       "billingCycle": "monthly",
       "price": 4500,
       "icon": "car.fill",
-      "quickStartTags": ["car"]
+      "quickStartTags": [
+        "car"
+      ]
     },
     {
       "name": "Benzin/diesel",
@@ -126,7 +141,9 @@
       "billingCycle": "monthly",
       "price": 1800,
       "icon": "fuelpump.fill",
-      "quickStartTags": ["car"]
+      "quickStartTags": [
+        "car"
+      ]
     },
     {
       "name": "Pendlerkort",
@@ -148,7 +165,9 @@
       "billingCycle": "monthly",
       "price": 28500,
       "icon": "banknote.fill",
-      "quickStartTags": ["job"]
+      "quickStartTags": [
+        "job"
+      ]
     },
     {
       "name": "SU (udeboende)",
@@ -184,7 +203,9 @@
       "billingCycle": "yearly",
       "price": 7966,
       "icon": "house.fill",
-      "quickStartTags": ["own"]
+      "quickStartTags": [
+        "own"
+      ]
     },
     {
       "name": "Grundejerforening",
@@ -192,7 +213,9 @@
       "billingCycle": "yearly",
       "price": 1800,
       "icon": "person.3.fill",
-      "quickStartTags": ["own"]
+      "quickStartTags": [
+        "own"
+      ]
     },
     {
       "name": "Folkepension (fuld sats, enlig)",
