@@ -107,6 +107,18 @@
   .add-card h2 { font-size: 1rem; margin: 0 0 10px; }
   .add-card input, .add-card select { margin-bottom: 8px; }
 
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .tag-check {
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 10px; border: 1px solid var(--border); border-radius: 999px;
+    font-size: 0.82rem; cursor: pointer; background: var(--bg);
+  }
+  .tag-check input { width: auto; margin: 0; }
+  .tag-badge {
+    font-size: 0.7rem; font-weight: 600; color: var(--accent);
+    background: #e8f1fb; padding: 2px 7px; border-radius: 999px; margin-left: 4px;
+  }
+
   .footer-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--card); border-top: 1px solid var(--border);
@@ -149,6 +161,8 @@
     </div>
     <input type="text" id="newDomain" placeholder="Domæne til logo (valgfrit, fx tdc.dk)">
     <input type="text" id="newIcon" placeholder="SF Symbol-ikon (valgfrit, fx house.fill)">
+    <div class="field-label">Foreslås i "Kom hurtigt i gang"-guiden når svaret er…</div>
+    <div class="tag-row" id="newTagRow"></div>
     <div class="entry-actions">
       <button class="btn btn-secondary" id="newSuggestBtn" onclick="suggestPrice(null)">✨ Slå værdi op med AI</button>
       <button class="btn btn-primary" onclick="addEntry()">Tilføj</button>
@@ -165,6 +179,31 @@
 <script>
 let entries = [];
 let openIndex = null;
+
+// Kept in sync with server.py's VALID_QUICKSTART_TAGS.
+const QUICKSTART_TAGS = [
+  { id: 'job', label: 'Arbejde' },
+  { id: 'rent', label: 'Til leje' },
+  { id: 'own', label: 'Ejerbolig' },
+  { id: 'car', label: 'Bil' },
+  { id: 'always', label: 'Altid (typisk)' },
+];
+
+function tagCheckboxesHtml(prefix, activeTags) {
+  const active = new Set(activeTags || []);
+  return QUICKSTART_TAGS.map(t => `
+    <label class="tag-check">
+      <input type="checkbox" id="tag-${prefix}-${t.id}" ${active.has(t.id) ? 'checked' : ''}>
+      ${t.label}
+    </label>
+  `).join('');
+}
+
+function readCheckedTags(prefix) {
+  return QUICKSTART_TAGS
+    .filter(t => document.getElementById(`tag-${prefix}-${t.id}`).checked)
+    .map(t => t.id);
+}
 
 function setStatus(text, cls) {
   const el = document.getElementById('status');
@@ -221,7 +260,7 @@ function render() {
     head.innerHTML = `
       ${e.domain ? `<img class="logo" src="${logoUrl(e.domain)}" alt="">` : '<div class="logo"></div>'}
       <div>
-        <div class="entry-title">${escapeHtml(e.name)} <span class="badge ${e.category === 'income' ? 'badge-income' : 'badge-expense'}">${categoryLabel(e.category)}</span></div>
+        <div class="entry-title">${escapeHtml(e.name)} <span class="badge ${e.category === 'income' ? 'badge-income' : 'badge-expense'}">${categoryLabel(e.category)}</span>${(e.quickStartTags || []).map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`).join('')}</div>
         <div class="entry-sub">${e.price} kr. · ${cycleLabel(e.billingCycle)}${e.icon ? ' · ' + escapeHtml(e.icon) : ''}</div>
       </div>
       <div class="chevron">▶</div>
@@ -251,6 +290,8 @@ function render() {
       <input type="text" id="domain-${i}" value="${escapeAttr(e.domain || '')}">
       <div class="field-label">SF Symbol-ikon (valgfrit, bruges hvis intet domæne)</div>
       <input type="text" id="icon-${i}" value="${escapeAttr(e.icon || '')}">
+      <div class="field-label">Foreslås i "Kom hurtigt i gang"-guiden når svaret er…</div>
+      <div class="tag-row">${tagCheckboxesHtml(i, e.quickStartTags)}</div>
       <div class="entry-actions">
         <button class="btn btn-secondary" id="suggestBtn-${i}" onclick="suggestPrice(${i})">✨ Opdater værdi med AI</button>
       </div>
@@ -308,6 +349,7 @@ async function saveEntry(i, originalName) {
     billingCycle: document.getElementById(`cycle-${i}`).value,
     domain: document.getElementById(`domain-${i}`).value.trim(),
     icon: document.getElementById(`icon-${i}`).value.trim(),
+    quickStartTags: readCheckedTags(i),
   };
   const data = await mutate('/api/budgetItems/' + encodeURIComponent(originalName), 'PUT', updated, 'Gemmer…');
   if (!data) return;
@@ -332,14 +374,16 @@ async function addEntry() {
   const billingCycle = document.getElementById('newCycle').value;
   const domain = document.getElementById('newDomain').value.trim();
   const icon = document.getElementById('newIcon').value.trim();
+  const quickStartTags = readCheckedTags('new');
   if (!name) { setStatus('Posten skal have et navn', 'err'); return; }
   if (price <= 0) { setStatus('Indsæt et beløb', 'err'); return; }
-  const data = await mutate('/api/budgetItems', 'POST', { name, category, price, billingCycle, domain, icon }, 'Tilføjer…');
+  const data = await mutate('/api/budgetItems', 'POST', { name, category, price, billingCycle, domain, icon, quickStartTags }, 'Tilføjer…');
   if (!data) return;
   document.getElementById('newName').value = '';
   document.getElementById('newPrice').value = '';
   document.getElementById('newDomain').value = '';
   document.getElementById('newIcon').value = '';
+  document.getElementById('newTagRow').innerHTML = tagCheckboxesHtml('new', []);
   setStatus(syncMessage('Tilføjet.', data.sync), data.sync && !data.sync.ok ? 'err' : 'ok');
   render();
 }
@@ -392,6 +436,7 @@ async function syncToGitHub() {
 }
 
 document.getElementById('search').addEventListener('input', render);
+document.getElementById('newTagRow').innerHTML = tagCheckboxesHtml('new', []);
 load();
 
 setInterval(() => {

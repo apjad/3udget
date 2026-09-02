@@ -26,6 +26,9 @@ PORT = 8422
 FILE_LOCK = threading.Lock()
 VALID_CATEGORIES = {"fixedExpense", "income"}
 VALID_CYCLES = {"monthly", "quarterly", "yearly"}
+# Which QuickStartWizardView answer(s) in the app surface this entry as a suggestion — "always"
+# means "regardless of the other answers" (e.g. El, Internet).
+VALID_QUICKSTART_TAGS = {"job", "rent", "own", "car", "always"}
 
 
 def load_credentials():
@@ -70,11 +73,20 @@ def clean_entry(entry, index_label):
     cycle = str(entry.get("billingCycle", "")).strip()
     if cycle not in VALID_CYCLES:
         raise ValueError(f'"{name}" skal have "monthly", "quarterly" eller "yearly" som gentagelse')
+    raw_tags = entry.get("quickStartTags") or []
+    if not isinstance(raw_tags, list):
+        raise ValueError(f'"{name}" har ugyldige quick-start tags')
+    tags = sorted({str(t).strip() for t in raw_tags if str(t).strip()})
+    invalid = [t for t in tags if t not in VALID_QUICKSTART_TAGS]
+    if invalid:
+        raise ValueError(f'"{name}" har ukendte quick-start tags: {", ".join(invalid)}')
     cleaned = {"name": name, "category": category, "billingCycle": cycle, "price": price}
     if domain:
         cleaned["domain"] = domain
     if icon:
         cleaned["icon"] = icon
+    if tags:
+        cleaned["quickStartTags"] = tags
     return cleaned
 
 
