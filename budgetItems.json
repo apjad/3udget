@@ -192,6 +192,13 @@
       "icon": "house.fill"
     },
     {
+      "name": "Førtidspension (fuld sats, enlig)",
+      "category": "income",
+      "billingCycle": "monthly",
+      "price": 14200,
+      "icon": "banknote.fill"
+    },
+    {
       "name": "Dagpenge (maks. sats)",
       "category": "income",
       "billingCycle": "monthly",
