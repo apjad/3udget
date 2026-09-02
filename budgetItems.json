@@ -175,14 +175,20 @@
       "category": "income",
       "billingCycle": "monthly",
       "price": 7030,
-      "icon": "graduationcap.fill"
+      "icon": "graduationcap.fill",
+      "quickStartTags": [
+        "noJob"
+      ]
     },
     {
       "name": "Børne- og ungeydelse (pr. barn)",
       "category": "income",
       "billingCycle": "quarterly",
       "price": 3881,
-      "icon": "figure.2.and.child.holdinghands"
+      "icon": "figure.2.and.child.holdinghands",
+      "quickStartTags": [
+        "noJob"
+      ]
     },
     {
       "name": "Boligstøtte",
@@ -196,14 +202,20 @@
       "category": "income",
       "billingCycle": "monthly",
       "price": 14200,
-      "icon": "banknote.fill"
+      "icon": "banknote.fill",
+      "quickStartTags": [
+        "noJob"
+      ]
     },
     {
       "name": "Dagpenge (maks. sats)",
       "category": "income",
       "billingCycle": "monthly",
       "price": 21116,
-      "icon": "banknote.fill"
+      "icon": "banknote.fill",
+      "quickStartTags": [
+        "noJob"
+      ]
     },
     {
       "name": "Ejendomsskat/grundskyld (hus)",
@@ -244,21 +256,30 @@
       "category": "income",
       "billingCycle": "monthly",
       "price": 22041,
-      "icon": "figure.2.and.child.holdinghands"
+      "icon": "figure.2.and.child.holdinghands",
+      "quickStartTags": [
+        "noJob"
+      ]
     },
     {
       "name": "Kontanthjælp (over 30 år)",
       "category": "income",
       "billingCycle": "monthly",
       "price": 13060,
-      "icon": "banknote.fill"
+      "icon": "banknote.fill",
+      "quickStartTags": [
+        "noJob"
+      ]
     },
     {
       "name": "Sygedagpenge (maks. sats)",
       "category": "income",
       "billingCycle": "monthly",
       "price": 22041,
-      "icon": "cross.case.fill"
+      "icon": "cross.case.fill",
+      "quickStartTags": [
+        "noJob"
+      ]
     },
     {
       "name": "Tandforsikring",

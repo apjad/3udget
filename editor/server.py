@@ -28,7 +28,7 @@ VALID_CATEGORIES = {"fixedExpense", "income"}
 VALID_CYCLES = {"monthly", "quarterly", "yearly"}
 # Which QuickStartWizardView answer(s) in the app surface this entry as a suggestion — "always"
 # means "regardless of the other answers" (e.g. El, Internet).
-VALID_QUICKSTART_TAGS = {"job", "rent", "own", "car", "always"}
+VALID_QUICKSTART_TAGS = {"job", "rent", "own", "car", "always", "noJob"}
 
 
 def load_credentials():
