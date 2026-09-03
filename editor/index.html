@@ -156,6 +156,7 @@
       <select id="newCycle">
         <option value="monthly">Månedligt</option>
         <option value="quarterly">Kvartalsvist</option>
+        <option value="semiAnnual">Halvårligt</option>
         <option value="yearly">Årligt</option>
       </select>
     </div>
@@ -218,6 +219,7 @@ function logoUrl(domain) {
 
 function cycleLabel(cycle) {
   if (cycle === 'yearly') return 'årligt';
+  if (cycle === 'semiAnnual') return 'halvårligt';
   if (cycle === 'quarterly') return 'kvartalsvist';
   return 'månedligt';
 }
@@ -284,6 +286,7 @@ function render() {
         <select id="cycle-${i}">
           <option value="monthly" ${e.billingCycle === 'monthly' ? 'selected' : ''}>Månedligt</option>
           <option value="quarterly" ${e.billingCycle === 'quarterly' ? 'selected' : ''}>Kvartalsvist</option>
+          <option value="semiAnnual" ${e.billingCycle === 'semiAnnual' ? 'selected' : ''}>Halvårligt</option>
           <option value="yearly" ${e.billingCycle === 'yearly' ? 'selected' : ''}>Årligt</option>
         </select>
       </div>

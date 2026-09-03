@@ -147,6 +147,16 @@
       ]
     },
     {
+      "name": "Vægtafgift/motorafgift",
+      "category": "fixedExpense",
+      "billingCycle": "semiAnnual",
+      "price": 460,
+      "icon": "car.fill",
+      "quickStartTags": [
+        "car"
+      ]
+    },
+    {
       "name": "Pendlerkort",
       "category": "fixedExpense",
       "billingCycle": "monthly",

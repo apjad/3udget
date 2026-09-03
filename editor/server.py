@@ -25,7 +25,7 @@ PORT = 8422
 
 FILE_LOCK = threading.Lock()
 VALID_CATEGORIES = {"fixedExpense", "income"}
-VALID_CYCLES = {"monthly", "quarterly", "yearly"}
+VALID_CYCLES = {"monthly", "quarterly", "semiAnnual", "yearly"}
 # Which QuickStartWizardView answer(s) in the app surface this entry as a suggestion — "always"
 # means "regardless of the other answers" (e.g. El, Internet).
 VALID_QUICKSTART_TAGS = {"job", "rent", "own", "car", "always", "noJob"}
@@ -72,7 +72,7 @@ def clean_entry(entry, index_label):
         raise ValueError(f'"{name}" kan ikke have en negativ pris')
     cycle = str(entry.get("billingCycle", "")).strip()
     if cycle not in VALID_CYCLES:
-        raise ValueError(f'"{name}" skal have "monthly", "quarterly" eller "yearly" som gentagelse')
+        raise ValueError(f'"{name}" skal have "monthly", "quarterly", "semiAnnual" eller "yearly" som gentagelse')
     raw_tags = entry.get("quickStartTags") or []
     if not isinstance(raw_tags, list):
         raise ValueError(f'"{name}" har ugyldige quick-start tags')
@@ -250,14 +250,15 @@ class Handler(BaseHTTPRequestHandler):
             f"satser, etc.) where relevant, not a guess. Report the amount per occurrence of "
             f"whichever billing cycle is the natural/standard one for this item (most household "
             f"bills are monthly, but heating/water aconto and things like børnetilskud are "
-            f"typically quarterly, and some are yearly) — report the raw per-occurrence amount, "
+            f"typically quarterly, Danish vehicle weight duty (vægtafgift/motorafgift) is "
+            f"semiAnnual, and some are yearly) — report the raw per-occurrence amount, "
             f"not already averaged to monthly."
         )
         schema = json.dumps({
             "type": "object",
             "properties": {
                 "price": {"type": "number"},
-                "billingCycle": {"type": "string", "enum": ["monthly", "quarterly", "yearly"]},
+                "billingCycle": {"type": "string", "enum": ["monthly", "quarterly", "semiAnnual", "yearly"]},
                 "category": {"type": "string", "enum": ["fixedExpense", "income"]},
             },
             "required": ["price", "billingCycle", "category"],
