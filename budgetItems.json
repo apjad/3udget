@@ -106,7 +106,7 @@
       "name": "A-kasse",
       "category": "fixedExpense",
       "billingCycle": "monthly",
-      "price": 500,
+      "price": 580.0,
       "icon": "person.3.fill"
     },
     {
