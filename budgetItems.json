@@ -137,7 +137,7 @@
       ]
     },
     {
-      "name": "Benzin/diesel/El",
+      "name": "Benzin/diesel",
       "category": "fixedExpense",
       "billingCycle": "monthly",
       "price": 1000.0,
