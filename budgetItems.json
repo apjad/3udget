@@ -137,10 +137,10 @@
       ]
     },
     {
-      "name": "Benzin/diesel",
+      "name": "Benzin/diesel/El",
       "category": "fixedExpense",
       "billingCycle": "monthly",
-      "price": 1800,
+      "price": 1000.0,
       "icon": "fuelpump.fill",
       "quickStartTags": [
         "car"
