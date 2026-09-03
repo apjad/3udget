@@ -11,10 +11,10 @@
       ]
     },
     {
-      "name": "Boligydelse/realkreditlån (hus)",
+      "name": "Boliglån/realkreditydelse (hus)",
       "category": "fixedExpense",
       "billingCycle": "monthly",
-      "price": 12500,
+      "price": 12500.0,
       "icon": "house.fill",
       "quickStartTags": [
         "own"
