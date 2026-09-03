@@ -34,8 +34,12 @@
       "name": "Varme (aconto)",
       "category": "fixedExpense",
       "billingCycle": "quarterly",
-      "price": 4500,
-      "icon": "flame.fill"
+      "price": 4500.0,
+      "icon": "flame.fill",
+      "quickStartTags": [
+        "own",
+        "rent"
+      ]
     },
     {
       "name": "Vand (aconto)",
