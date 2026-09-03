@@ -105,6 +105,8 @@ def clean_entry(entry, index_label):
         cleaned["icon"] = icon
     if tags:
         cleaned["quickStartTags"] = tags
+    if entry.get("isLoanLikely"):
+        cleaned["isLoanLikely"] = True
     if len(options) > 1:
         price_options = []
         for o in options:

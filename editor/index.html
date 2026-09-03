@@ -159,6 +159,10 @@
     <div id="newTiers"></div>
     <input type="text" id="newDomain" placeholder="Domæne til logo (valgfrit, fx tdc.dk)">
     <input type="text" id="newIcon" placeholder="SF Symbol-ikon (valgfrit, fx house.fill)">
+    <label class="tag-check" style="margin-bottom: 8px; width: fit-content;">
+      <input type="checkbox" id="newIsLoanLikely">
+      Ofte et lån (fx bilydelse, boliglån)
+    </label>
     <div class="field-label">Foreslås i "Kom hurtigt i gang"-guiden når svaret er…</div>
     <div class="tag-row" id="newTagRow"></div>
     <div class="entry-actions">
@@ -343,7 +347,7 @@ function render() {
     head.innerHTML = `
       ${e.domain ? `<img class="logo" src="${logoUrl(e.domain)}" alt="">` : '<div class="logo"></div>'}
       <div>
-        <div class="entry-title">${escapeHtml(e.name)} <span class="badge ${e.category === 'income' ? 'badge-income' : 'badge-expense'}">${categoryLabel(e.category)}</span>${(e.quickStartTags || []).map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`).join('')}</div>
+        <div class="entry-title">${escapeHtml(e.name)} <span class="badge ${e.category === 'income' ? 'badge-income' : 'badge-expense'}">${categoryLabel(e.category)}</span>${e.isLoanLikely ? '<span class="tag-badge">lån</span>' : ''}${(e.quickStartTags || []).map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`).join('')}</div>
         <div class="entry-sub">${e.price} kr. · ${cycleLabel(e.billingCycle)}${e.priceOptions && e.priceOptions.length > 1 ? ` · ${e.priceOptions.length} priser` : ''}${e.icon ? ' · ' + escapeHtml(e.icon) : ''}</div>
       </div>
       <div class="chevron">▶</div>
@@ -368,6 +372,10 @@ function render() {
       <input type="text" id="domain-${i}" value="${escapeAttr(e.domain || '')}">
       <div class="field-label">SF Symbol-ikon (valgfrit, bruges hvis intet domæne)</div>
       <input type="text" id="icon-${i}" value="${escapeAttr(e.icon || '')}">
+      <label class="tag-check" style="margin-bottom: 8px; width: fit-content;">
+        <input type="checkbox" id="isLoanLikely-${i}" ${e.isLoanLikely ? 'checked' : ''}>
+        Ofte et lån (fx bilydelse, boliglån)
+      </label>
       <div class="field-label">Foreslås i "Kom hurtigt i gang"-guiden når svaret er…</div>
       <div class="tag-row">${tagCheckboxesHtml(i, e.quickStartTags)}</div>
       <div class="entry-actions">
@@ -428,6 +436,7 @@ async function saveEntry(i, originalName) {
     icon: document.getElementById(`icon-${i}`).value.trim(),
     quickStartTags: readCheckedTags(i),
     priceOptions: readTiersFromDom(key),
+    isLoanLikely: document.getElementById(`isLoanLikely-${i}`).checked,
   };
   const data = await mutate('/api/budgetItems/' + encodeURIComponent(originalName), 'PUT', updated, 'Gemmer…');
   if (!data) return;
@@ -453,10 +462,12 @@ async function addEntry() {
   const icon = document.getElementById('newIcon').value.trim();
   const quickStartTags = readCheckedTags('new');
   const priceOptions = readTiersFromDom('new');
+  const isLoanLikely = document.getElementById('newIsLoanLikely').checked;
   if (!name) { setStatus('Posten skal have et navn', 'err'); return; }
   if (!priceOptions.length || priceOptions[0].price <= 0) { setStatus('Indsæt et beløb', 'err'); return; }
-  const data = await mutate('/api/budgetItems', 'POST', { name, category, domain, icon, quickStartTags, priceOptions }, 'Tilføjer…');
+  const data = await mutate('/api/budgetItems', 'POST', { name, category, domain, icon, quickStartTags, priceOptions, isLoanLikely }, 'Tilføjer…');
   if (!data) return;
+  document.getElementById('newIsLoanLikely').checked = false;
   document.getElementById('newName').value = '';
   document.getElementById('newDomain').value = '';
   document.getElementById('newIcon').value = '';
