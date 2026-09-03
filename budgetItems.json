@@ -348,7 +348,7 @@
       "name": "Clever One",
       "category": "fixedExpense",
       "billingCycle": "monthly",
-      "price": 899.0,
+      "price": 999.0,
       "quickStartTags": [
         "car"
       ]
