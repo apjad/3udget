@@ -18,7 +18,8 @@
       "icon": "house.fill",
       "quickStartTags": [
         "own"
-      ]
+      ],
+      "isLoanLikely": true
     },
     {
       "name": "El",
