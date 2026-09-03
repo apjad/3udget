@@ -338,10 +338,13 @@
       "icon": "figure.2.and.child.holdinghands"
     },
     {
-      "name": "Clever",
+      "name": "Clever One",
       "category": "fixedExpense",
       "billingCycle": "monthly",
-      "price": 899.0
+      "price": 899.0,
+      "quickStartTags": [
+        "car"
+      ]
     }
   ]
 }
