@@ -107,7 +107,10 @@
       "category": "fixedExpense",
       "billingCycle": "monthly",
       "price": 580.0,
-      "icon": "person.3.fill"
+      "icon": "person.3.fill",
+      "quickStartTags": [
+        "job"
+      ]
     },
     {
       "name": "Vuggestue",
