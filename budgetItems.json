@@ -352,6 +352,35 @@
       "quickStartTags": [
         "car"
       ]
+    },
+    {
+      "name": "Børneydelse",
+      "category": "income",
+      "billingCycle": "quarterly",
+      "price": 5370.0,
+      "icon": "figure.2.and.child.holdinghands",
+      "quickStartTags": [
+        "always"
+      ],
+      "priceOptions": [
+        {
+          "label": "0–2 år",
+          "price": 5370.0
+        },
+        {
+          "label": "3–6 år",
+          "price": 4248.0
+        },
+        {
+          "label": "7–14 år",
+          "price": 3342.0
+        },
+        {
+          "label": "15–17 år",
+          "price": 1114.0,
+          "billingCycle": "monthly"
+        }
+      ]
     }
   ]
 }
