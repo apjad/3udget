@@ -203,8 +203,11 @@
       "name": "Boligstøtte",
       "category": "income",
       "billingCycle": "monthly",
-      "price": 1800,
-      "icon": "house.fill"
+      "price": 1800.0,
+      "icon": "house.fill",
+      "quickStartTags": [
+        "noJob"
+      ]
     },
     {
       "name": "Førtidspension (fuld sats, enlig)",
