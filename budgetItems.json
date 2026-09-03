@@ -137,7 +137,7 @@
       "name": "Bilydelse/leasing",
       "category": "fixedExpense",
       "billingCycle": "monthly",
-      "price": 4500,
+      "price": 4500.0,
       "icon": "car.fill",
       "quickStartTags": [
         "car"
