@@ -142,7 +142,8 @@
       "icon": "car.fill",
       "quickStartTags": [
         "car"
-      ]
+      ],
+      "isLoanLikely": true
     },
     {
       "name": "Benzin/diesel",
