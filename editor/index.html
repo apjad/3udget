@@ -97,9 +97,13 @@
   .entry-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
   .entry.open .entry-body { display: block; }
   .field-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); margin: 12px 0 6px; }
-  .price-row { display: flex; gap: 8px; }
+  .price-row { display: flex; gap: 8px; align-items: center; }
   .price-row input { flex: 2; }
   .price-row select { flex: 1; }
+  .price-tier { margin-bottom: 8px; }
+  .tier-label { margin-bottom: 4px; }
+  .tier-remove { flex: 0 0 auto !important; padding: 8px 10px !important; width: auto !important; }
+  .tier-add { margin-bottom: 4px; font-size: 0.85rem; padding: 8px 12px; }
 
   .entry-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 
@@ -151,15 +155,8 @@
       <option value="fixedExpense">Fast udgift</option>
       <option value="income">Indtægt</option>
     </select>
-    <div class="price-row">
-      <input type="number" id="newPrice" placeholder="Beløb (kr.)">
-      <select id="newCycle">
-        <option value="monthly">Månedligt</option>
-        <option value="quarterly">Kvartalsvist</option>
-        <option value="semiAnnual">Halvårligt</option>
-        <option value="yearly">Årligt</option>
-      </select>
-    </div>
+    <div class="field-label">Beløb</div>
+    <div id="newTiers"></div>
     <input type="text" id="newDomain" placeholder="Domæne til logo (valgfrit, fx tdc.dk)">
     <input type="text" id="newIcon" placeholder="SF Symbol-ikon (valgfrit, fx house.fill)">
     <div class="field-label">Foreslås i "Kom hurtigt i gang"-guiden når svaret er…</div>
@@ -224,6 +221,89 @@ function cycleLabel(cycle) {
   return 'månedligt';
 }
 
+// Draft price tiers per entry, keyed by String(index) or 'new' — lets someone add/remove tier
+// rows client-side (e.g. building out børneydelse's age brackets) before saving. Cleared once the
+// entry is saved so the next open re-derives from the server's copy.
+let tierDrafts = {};
+
+function getTierDraft(key, entry) {
+  if (!(key in tierDrafts)) {
+    if (entry && entry.priceOptions && entry.priceOptions.length > 1) {
+      // Tier 0's own billingCycle is omitted from the JSON when it matches the entry's base cycle
+      // (that's what makes it the base) — fall back to entry.billingCycle there specifically, since
+      // an empty string there would otherwise land on "(samme som først)"'s own default of monthly.
+      tierDrafts[key] = entry.priceOptions.map((o, idx) => ({
+        label: o.label,
+        price: o.price,
+        billingCycle: o.billingCycle || (idx === 0 ? entry.billingCycle : ''),
+      }));
+    } else if (entry) {
+      tierDrafts[key] = [{ label: '', price: entry.price, billingCycle: entry.billingCycle }];
+    } else {
+      tierDrafts[key] = [{ label: '', price: '', billingCycle: 'monthly' }];
+    }
+  }
+  return tierDrafts[key];
+}
+
+function readTiersFromDom(key) {
+  const draft = tierDrafts[key] || [];
+  return draft.map((_, idx) => {
+    const labelEl = document.getElementById(`tierLabel-${key}-${idx}`);
+    const priceEl = document.getElementById(`tierPrice-${key}-${idx}`);
+    const cycleEl = document.getElementById(`tierCycle-${key}-${idx}`);
+    return {
+      label: labelEl ? labelEl.value.trim() : '',
+      price: priceEl ? parseFloat(priceEl.value) || 0 : 0,
+      billingCycle: cycleEl ? cycleEl.value : '',
+    };
+  });
+}
+
+function addTier(key) {
+  tierDrafts[key] = readTiersFromDom(key);
+  tierDrafts[key].push({ label: '', price: 0, billingCycle: '' });
+  if (key === 'new') renderNewTiers(); else render();
+}
+
+function removeTier(key, idx) {
+  tierDrafts[key] = readTiersFromDom(key);
+  tierDrafts[key].splice(idx, 1);
+  if (key === 'new') renderNewTiers(); else render();
+}
+
+// idx 0 (the default/top price) must always pick its own cycle; later tiers can leave it blank
+// to inherit tier 0's cycle instead — matches how the app treats a tier's nil billingCycle.
+function cycleOptionsHtml(selected, allowInherit) {
+  const opts = [
+    ...(allowInherit ? [{ v: '', l: '(samme som først)' }] : []),
+    { v: 'monthly', l: 'Månedligt' },
+    { v: 'quarterly', l: 'Kvartalsvist' },
+    { v: 'semiAnnual', l: 'Halvårligt' },
+    { v: 'yearly', l: 'Årligt' },
+  ];
+  return opts.map(o => `<option value="${o.v}" ${o.v === (selected || '') ? 'selected' : ''}>${o.l}</option>`).join('');
+}
+
+function priceTiersHtml(key, tiers) {
+  const multi = tiers.length > 1;
+  const rows = tiers.map((t, idx) => `
+    <div class="price-tier">
+      ${multi ? `<input type="text" class="tier-label" id="tierLabel-${key}-${idx}" placeholder="Label (fx 0–2 år)" value="${escapeAttr(t.label || '')}">` : ''}
+      <div class="price-row">
+        <input type="number" id="tierPrice-${key}-${idx}" placeholder="Beløb (kr.)" value="${t.price || ''}">
+        <select id="tierCycle-${key}-${idx}">${cycleOptionsHtml(t.billingCycle, idx > 0)}</select>
+        ${multi ? `<button type="button" class="btn btn-danger tier-remove" onclick="removeTier('${key}', ${idx})">✕</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+  return `${rows}<button type="button" class="btn btn-secondary tier-add" onclick="addTier('${key}')">+ Tilføj prismulighed${multi ? '' : ' (fx efter alder)'}</button>`;
+}
+
+function renderNewTiers() {
+  document.getElementById('newTiers').innerHTML = priceTiersHtml('new', getTierDraft('new', null));
+}
+
 function categoryLabel(category) {
   return category === 'income' ? 'Indtægt' : 'Fast udgift';
 }
@@ -264,12 +344,14 @@ function render() {
       ${e.domain ? `<img class="logo" src="${logoUrl(e.domain)}" alt="">` : '<div class="logo"></div>'}
       <div>
         <div class="entry-title">${escapeHtml(e.name)} <span class="badge ${e.category === 'income' ? 'badge-income' : 'badge-expense'}">${categoryLabel(e.category)}</span>${(e.quickStartTags || []).map(t => `<span class="tag-badge">${escapeHtml(t)}</span>`).join('')}</div>
-        <div class="entry-sub">${e.price} kr. · ${cycleLabel(e.billingCycle)}${e.icon ? ' · ' + escapeHtml(e.icon) : ''}</div>
+        <div class="entry-sub">${e.price} kr. · ${cycleLabel(e.billingCycle)}${e.priceOptions && e.priceOptions.length > 1 ? ` · ${e.priceOptions.length} priser` : ''}${e.icon ? ' · ' + escapeHtml(e.icon) : ''}</div>
       </div>
       <div class="chevron">▶</div>
     `;
     head.onclick = () => { openIndex = openIndex === i ? null : i; render(); };
 
+    const tierKey = String(i);
+    const tiers = getTierDraft(tierKey, e);
     const body = document.createElement('div');
     body.className = 'entry-body';
     body.innerHTML = `
@@ -280,16 +362,8 @@ function render() {
         <option value="fixedExpense" ${e.category === 'fixedExpense' ? 'selected' : ''}>Fast udgift</option>
         <option value="income" ${e.category === 'income' ? 'selected' : ''}>Indtægt</option>
       </select>
-      <div class="field-label">Beløb og gentagelse</div>
-      <div class="price-row">
-        <input type="number" id="price-${i}" value="${e.price}">
-        <select id="cycle-${i}">
-          <option value="monthly" ${e.billingCycle === 'monthly' ? 'selected' : ''}>Månedligt</option>
-          <option value="quarterly" ${e.billingCycle === 'quarterly' ? 'selected' : ''}>Kvartalsvist</option>
-          <option value="semiAnnual" ${e.billingCycle === 'semiAnnual' ? 'selected' : ''}>Halvårligt</option>
-          <option value="yearly" ${e.billingCycle === 'yearly' ? 'selected' : ''}>Årligt</option>
-        </select>
-      </div>
+      <div class="field-label">Beløb${tiers.length > 1 ? ' — første er standard' : ''}</div>
+      ${priceTiersHtml(tierKey, tiers)}
       <div class="field-label">Domæne (til logo, valgfrit)</div>
       <input type="text" id="domain-${i}" value="${escapeAttr(e.domain || '')}">
       <div class="field-label">SF Symbol-ikon (valgfrit, bruges hvis intet domæne)</div>
@@ -346,17 +420,18 @@ function syncMessage(localMsg, sync) {
 }
 
 async function saveEntry(i, originalName) {
+  const key = String(i);
   const updated = {
     name: document.getElementById(`name-${i}`).value.trim(),
     category: document.getElementById(`category-${i}`).value,
-    price: parseFloat(document.getElementById(`price-${i}`).value) || 0,
-    billingCycle: document.getElementById(`cycle-${i}`).value,
     domain: document.getElementById(`domain-${i}`).value.trim(),
     icon: document.getElementById(`icon-${i}`).value.trim(),
     quickStartTags: readCheckedTags(i),
+    priceOptions: readTiersFromDom(key),
   };
   const data = await mutate('/api/budgetItems/' + encodeURIComponent(originalName), 'PUT', updated, 'Gemmer…');
   if (!data) return;
+  delete tierDrafts[key];
   setStatus(syncMessage('Gemt.', data.sync), data.sync && !data.sync.ok ? 'err' : 'ok');
   openIndex = null;
   render();
@@ -374,29 +449,29 @@ async function deleteEntry(i, name) {
 async function addEntry() {
   const name = document.getElementById('newName').value.trim();
   const category = document.getElementById('newCategory').value;
-  const price = parseFloat(document.getElementById('newPrice').value) || 0;
-  const billingCycle = document.getElementById('newCycle').value;
   const domain = document.getElementById('newDomain').value.trim();
   const icon = document.getElementById('newIcon').value.trim();
   const quickStartTags = readCheckedTags('new');
+  const priceOptions = readTiersFromDom('new');
   if (!name) { setStatus('Posten skal have et navn', 'err'); return; }
-  if (price <= 0) { setStatus('Indsæt et beløb', 'err'); return; }
-  const data = await mutate('/api/budgetItems', 'POST', { name, category, price, billingCycle, domain, icon, quickStartTags }, 'Tilføjer…');
+  if (!priceOptions.length || priceOptions[0].price <= 0) { setStatus('Indsæt et beløb', 'err'); return; }
+  const data = await mutate('/api/budgetItems', 'POST', { name, category, domain, icon, quickStartTags, priceOptions }, 'Tilføjer…');
   if (!data) return;
   document.getElementById('newName').value = '';
-  document.getElementById('newPrice').value = '';
   document.getElementById('newDomain').value = '';
   document.getElementById('newIcon').value = '';
   document.getElementById('newTagRow').innerHTML = tagCheckboxesHtml('new', []);
+  delete tierDrafts['new'];
+  renderNewTiers();
   setStatus(syncMessage('Tilføjet.', data.sync), data.sync && !data.sync.ok ? 'err' : 'ok');
   render();
 }
 
-// i === null means the "+ Tilføj ny post" form; otherwise the row index being edited.
+// i === null means the "+ Tilføj ny post" form; otherwise the row index being edited. Only ever
+// touches tier 0 (the default price) — later tiers are for brackets the AI isn't asked about.
 async function suggestPrice(i) {
+  const key = i === null ? 'new' : String(i);
   const nameField = i === null ? 'newName' : `name-${i}`;
-  const priceField = i === null ? 'newPrice' : `price-${i}`;
-  const cycleField = i === null ? 'newCycle' : `cycle-${i}`;
   const categoryField = i === null ? 'newCategory' : `category-${i}`;
   const btnId = i === null ? 'newSuggestBtn' : `suggestBtn-${i}`;
   const name = document.getElementById(nameField).value.trim();
@@ -416,9 +491,12 @@ async function suggestPrice(i) {
       setStatus('Fejl: ' + data.error, 'err');
       return;
     }
-    document.getElementById(priceField).value = data.price;
-    document.getElementById(cycleField).value = data.billingCycle;
+    const priceEl = document.getElementById(`tierPrice-${key}-0`);
+    const cycleEl = document.getElementById(`tierCycle-${key}-0`);
+    if (priceEl) priceEl.value = data.price;
+    if (cycleEl) cycleEl.value = data.billingCycle;
     document.getElementById(categoryField).value = data.category;
+    tierDrafts[key] = readTiersFromDom(key);
     setStatus('Værdi opdateret — tjek den før du gemmer.', 'ok');
   } catch (e) {
     setStatus('Kunne ikke kontakte AI: ' + e, 'err');
@@ -441,6 +519,7 @@ async function syncToGitHub() {
 
 document.getElementById('search').addEventListener('input', render);
 document.getElementById('newTagRow').innerHTML = tagCheckboxesHtml('new', []);
+renderNewTiers();
 load();
 
 setInterval(() => {

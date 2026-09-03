@@ -53,6 +53,31 @@ AUTH_USERS = load_credentials()
 INDEX_HTML_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
 
 
+def clean_price_options(raw_options, name):
+    if not isinstance(raw_options, list) or not raw_options:
+        raise ValueError(f'"{name}" skal have mindst én pris')
+    cleaned = []
+    for i, opt in enumerate(raw_options):
+        if not isinstance(opt, dict):
+            raise ValueError(f'"{name}" har en ugyldig pris-mulighed')
+        label = str(opt.get("label", "")).strip()
+        try:
+            price = float(opt.get("price", 0))
+        except (TypeError, ValueError):
+            raise ValueError(f'"{name}" har en ugyldig pris i mulighed {i + 1}')
+        if price < 0:
+            raise ValueError(f'"{name}" kan ikke have en negativ pris')
+        cycle = str(opt.get("billingCycle", "")).strip()
+        if cycle and cycle not in VALID_CYCLES:
+            raise ValueError(f'"{name}" har en ugyldig gentagelse i mulighed {i + 1}')
+        cleaned.append({"label": label, "price": price, "billingCycle": cycle})
+    if cleaned[0]["billingCycle"] not in VALID_CYCLES:
+        raise ValueError(f'"{name}" mangler gentagelse på den første pris')
+    if len(cleaned) > 1 and any(not o["label"] for o in cleaned):
+        raise ValueError(f'"{name}" skal have en label på hver pris, når der er flere end én')
+    return cleaned
+
+
 def clean_entry(entry, index_label):
     if not isinstance(entry, dict):
         raise ValueError(f"{index_label} er ikke et gyldigt objekt")
@@ -64,15 +89,8 @@ def clean_entry(entry, index_label):
     category = str(entry.get("category", "")).strip()
     if category not in VALID_CATEGORIES:
         raise ValueError(f'"{name}" skal have "fixedExpense" eller "income" som type')
-    try:
-        price = float(entry.get("price", 0))
-    except (TypeError, ValueError):
-        raise ValueError(f'"{name}" har en ugyldig pris')
-    if price < 0:
-        raise ValueError(f'"{name}" kan ikke have en negativ pris')
-    cycle = str(entry.get("billingCycle", "")).strip()
-    if cycle not in VALID_CYCLES:
-        raise ValueError(f'"{name}" skal have "monthly", "quarterly", "semiAnnual" eller "yearly" som gentagelse')
+    options = clean_price_options(entry.get("priceOptions"), name)
+    base_cycle = options[0]["billingCycle"]
     raw_tags = entry.get("quickStartTags") or []
     if not isinstance(raw_tags, list):
         raise ValueError(f'"{name}" har ugyldige quick-start tags')
@@ -80,13 +98,21 @@ def clean_entry(entry, index_label):
     invalid = [t for t in tags if t not in VALID_QUICKSTART_TAGS]
     if invalid:
         raise ValueError(f'"{name}" har ukendte quick-start tags: {", ".join(invalid)}')
-    cleaned = {"name": name, "category": category, "billingCycle": cycle, "price": price}
+    cleaned = {"name": name, "category": category, "billingCycle": base_cycle, "price": options[0]["price"]}
     if domain:
         cleaned["domain"] = domain
     if icon:
         cleaned["icon"] = icon
     if tags:
         cleaned["quickStartTags"] = tags
+    if len(options) > 1:
+        price_options = []
+        for o in options:
+            po = {"label": o["label"], "price": o["price"]}
+            if o["billingCycle"] and o["billingCycle"] != base_cycle:
+                po["billingCycle"] = o["billingCycle"]
+            price_options.append(po)
+        cleaned["priceOptions"] = price_options
     return cleaned
 
 
