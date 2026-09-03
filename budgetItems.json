@@ -198,13 +198,6 @@
       ]
     },
     {
-      "name": "Børne- og ungeydelse (pr. barn)",
-      "category": "income",
-      "billingCycle": "quarterly",
-      "price": 3881.0,
-      "icon": "figure.2.and.child.holdinghands"
-    },
-    {
       "name": "Boligstøtte",
       "category": "income",
       "billingCycle": "monthly",
