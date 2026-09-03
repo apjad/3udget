@@ -78,7 +78,7 @@
       "name": "Bilforsikring",
       "category": "fixedExpense",
       "billingCycle": "monthly",
-      "price": 450,
+      "price": 500.0,
       "icon": "car.fill",
       "quickStartTags": [
         "car"
